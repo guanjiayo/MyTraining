@@ -47,6 +47,8 @@ NestedScrollView 将内部的 TabLayout + ViewPager 部分布局设置充满屏�
 2. 重写 onNestedPreScroll() ,因为嵌套滑动会一直找父布局是否能嵌套滑动,我们的NestedScrollView既是父布局,
 然后他也认为自己是子布局,因此重写 onNestedPreScroll() 这个找父布局的方法,然后根据场景,让他先滑,
 不可见时,再让RecycleView滑
-3. 实现惯性滑动
+3. 实现惯性滑动(通过换算公式)
 
-
+参考这两个老哥的RecycleView嵌套ViewPager+RecycleView完成最终方案
+https://cloud.tencent.com/developer/article/1730472
+https://github.com/JasonGaoH/NestedRecyclerView
