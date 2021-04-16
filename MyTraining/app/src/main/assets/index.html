@@ -1,0 +1,41 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=gb2312">
+    <title>WebView</title>
+    <style type="text/css">
+        body{
+          background: #aaccbb;
+        }
+        .btn{
+           line-height: 40px;
+           margin: 10px;
+           background: #ffcccc;
+        }
+
+
+    </style>
+
+</head>
+<body>
+<h3>H5 调用 Java 代码</h3>
+<div><span>请输入要传递的值: </span><input type="text" id="input"></div>
+<div id="btn"><span class="btn">点我</span></div>
+<script type="text/javascript">
+     var btnEle=document.getElementById("btn");
+     var inputEle=document.getElementById("input");
+     btnEle.addEventListener("click", function () {
+            var str = inputEle.value;
+            if(window.javaFunc){
+                 javaFunc.setValue(str);
+            } else {
+                alert("value not found");
+            }
+     });
+
+     var remote = function (str) {
+	    inputEle.value = str;
+	  }
+
+</script>
+</body>
+</html>

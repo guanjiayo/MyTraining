@@ -10,6 +10,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import zs.xmx.hi.training.handler.HandlerActivity
 import zs.xmx.hi.training.slide_conflict.SlideConflictActivity
+import zs.xmx.hi.training.webview.H5Activity
 import java.util.*
 
 /*
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         mList = ArrayList()
         mList.add("Handler")
         mList.add("Sliding conflict")
+        mList.add("WebView")
     }
 
     private fun initView() {
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         when (position) {
             0 -> startActivity(Intent(this, HandlerActivity::class.java))
             1 -> startActivity(Intent(this, SlideConflictActivity::class.java))
+            2 -> startActivity(Intent(this, H5Activity::class.java))
         }
     }
 
