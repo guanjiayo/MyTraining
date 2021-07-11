@@ -3,6 +3,7 @@
     package="zs.xmx.hi.training">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
@@ -11,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyTraining">
+        <activity android:name=".drift.FloatViewActivity"></activity>
         <activity android:name=".webview.H5Activity" />
         <activity android:name=".MainActivity">
             <intent-filter>

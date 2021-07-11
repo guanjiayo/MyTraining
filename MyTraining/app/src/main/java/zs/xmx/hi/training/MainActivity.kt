@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import zs.xmx.hi.training.drift.FloatViewActivity
 import zs.xmx.hi.training.handler.HandlerActivity
 import zs.xmx.hi.training.slide_conflict.SlideConflictActivity
 import zs.xmx.hi.training.webview.H5Activity
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         mList.add("Handler")
         mList.add("Sliding conflict")
         mList.add("WebView")
+        mList.add("WindowManage 悬浮窗测试")
     }
 
     private fun initView() {
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
             0 -> startActivity(Intent(this, HandlerActivity::class.java))
             1 -> startActivity(Intent(this, SlideConflictActivity::class.java))
             2 -> startActivity(Intent(this, H5Activity::class.java))
+            3 -> startActivity(Intent(this, FloatViewActivity::class.java))
         }
     }
 
