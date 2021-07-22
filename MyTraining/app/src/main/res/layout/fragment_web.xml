@@ -17,6 +17,7 @@
 
     <EditText
         android:id="@+id/editText"
+        android:hint="这里输入传给JS的文本"
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
@@ -26,5 +27,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <Button
+        android:id="@+id/btn_small"
+        android:text="最小化页面"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

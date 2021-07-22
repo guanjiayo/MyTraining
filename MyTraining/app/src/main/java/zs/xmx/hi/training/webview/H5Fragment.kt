@@ -12,6 +12,8 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import zs.xmx.hi.training.R
+import zs.xmx.hi.training.lifecycle.LifecycleObserverTest
+import zs.xmx.hi.training.lifecycle.LocationObserver
 
 
 /**
@@ -26,6 +28,7 @@ class H5Fragment : Fragment(), JSBridge {
     private lateinit var mText: TextView
     private lateinit var mEditText: EditText
     private lateinit var mBtn: Button
+    private lateinit var mBtnSmall: Button
     private lateinit var mWebView: WebView
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -40,6 +43,7 @@ class H5Fragment : Fragment(), JSBridge {
         mText = view.findViewById(R.id.textView)
         mEditText = view.findViewById(R.id.editText)
         mBtn = view.findViewById(R.id.btn)
+        mBtnSmall = view.findViewById(R.id.btn_small)
 
         val webSettings = mWebView.settings
         webSettings.apply {
@@ -56,8 +60,11 @@ class H5Fragment : Fragment(), JSBridge {
             mWebView.loadUrl("javascript:if(window.remote){window.remote('${str}')}")
         }
 
+        mBtnSmall.setOnClickListener {
+           activity!!.moveTaskToBack(true)
+        }
+
         mHanlder = Handler()
-        
         return view
     }
 
