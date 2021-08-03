@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".livedata.LiveDataTestActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Handler与LiveData传递消息比较" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:id="@+id/btn_no_sticky"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LiveDataBus发送事件" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:id="@+id/btn_sticky"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LiveDataBus发送粘性事件" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:id="@+id/btn_sticky_moni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LiveData粘性事件模拟" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

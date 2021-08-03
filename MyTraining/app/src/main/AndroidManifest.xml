@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="zs.xmx.hi.training">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,16 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyTraining">
-        <activity android:name=".lifecycle.LifecycleTestActivity"></activity>
-        <activity android:name=".drift.FloatViewActivity" />
-        <activity android:name=".webview.H5Activity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- <activity android:name=".MainActivity"> -->
+        </activity>
+        <activity android:name=".livedata.LiveDataTestActivity" />
+        <activity android:name=".livedata.LiveDataTest2Activity" />
+        <activity android:name=".livedata.LiveDataTest3Activity" />
+        <activity android:name=".lifecycle.LifecycleTestActivity" />
+        <activity android:name=".drift.FloatViewActivity" />
+        <activity android:name=".webview.H5Activity" />
         <activity android:name=".handler.HandlerActivity" />
         <activity android:name=".slide_conflict.SlideConflictActivity" />
     </application>
