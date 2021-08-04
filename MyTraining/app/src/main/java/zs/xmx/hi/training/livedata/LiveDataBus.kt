@@ -67,7 +67,7 @@ object LiveDataBus {
          * 对外暴露的observer() 方法
          */
         fun observerSticky(owner: LifecycleOwner, sticky: Boolean, observer: Observer<in T>) {
-            Log.e("跨页面测试","observerSticky()  owner: ${owner.javaClass.simpleName}")
+            //Log.e("跨页面测试","observerSticky()  owner: ${owner.javaClass.simpleName}")
             //允许指定注册的观察则 是否需要关心黏性事件
             //sticky =true, 如果之前存在已经发送的数据，那么这个observer会受到之前的黏性事件消息
             owner.lifecycle.addObserver(LifecycleEventObserver { source, event ->

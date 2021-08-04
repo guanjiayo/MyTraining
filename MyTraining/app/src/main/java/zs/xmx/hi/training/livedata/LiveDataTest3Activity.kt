@@ -15,6 +15,7 @@ import zs.xmx.hi.training.R
  * Author: 默小铭
  * Blog:   https://blog.csdn.net/u012792686
  * Desc:   LiveDataBus测试
+ *         粘性事件,就是说,我们同时注册多个观察者,后面新注册的会收到之前注册的观察者接收到的消息 当前源码 onResume()可以模拟出来
  */
 class LiveDataTest3Activity : AppCompatActivity() {
     private val TAG = "LiveDataTest3Activity"
@@ -59,13 +60,13 @@ class LiveDataTest3Activity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //注册多少个观察者,就能接受多少个消息
-        /* Handler(Looper.getMainLooper()).postDelayed(Runnable {
-             LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
-                 Log.e(TAG, "onResume noStickyData 参数返回： $it")
-             })
-             LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
-                 Log.e(TAG, "onResume StickyData 参数返回： $it")
-             })
-         }, 3000)*/
+        /*Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
+                Log.e(TAG, "onResume noStickyData 参数返回： $it")
+            })
+            LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
+                Log.e(TAG, "onResume StickyData 参数返回： $it")
+            })
+        }, 3000)*/
     }
 }

@@ -23,10 +23,6 @@ class LiveDataTestActivity : AppCompatActivity() {
             startActivity(Intent(this, LiveDataTest2Activity::class.java))
         }
 
-        findViewById<AppCompatButton>(R.id.btn_sticky_moni).setOnClickListener {
-            startActivity(Intent(this, LiveDataTest3Activity::class.java))
-        }
-
         findViewById<AppCompatButton>(R.id.btn_no_sticky).setOnClickListener {
             LiveDataBus.with<String>("noStickyData").setStickyData("noStickyData Event")
             startActivity(Intent(this, LiveDataTest3Activity::class.java))
