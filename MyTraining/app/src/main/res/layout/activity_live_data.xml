@@ -35,4 +35,11 @@
         android:layout_height="wrap_content"
         android:text="LiveData粘性事件模拟" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:id="@+id/btn_sticky_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LiveDataBus发送粘性事件(跨多页面测试)" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>

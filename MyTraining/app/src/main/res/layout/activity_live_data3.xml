@@ -28,5 +28,17 @@
         android:text="给上个页面发送forever消息"
         android:textAllCaps="false" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_sticky_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LiveDataBus发送粘性事件(在跳转到新页面)"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="观察LiveDataBus在这个页面销毁后,下个页面能不能接受到粘性事件" />
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -11,7 +11,7 @@ import java.util.*
 
 class LiveDataTestActivity : AppCompatActivity() {
 
-    val foreverObserver =
+    private val foreverObserver =
         Observer<String> { Log.e("LiveDataTest3Activity", "forever 参数返回： $it") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +34,11 @@ class LiveDataTestActivity : AppCompatActivity() {
 
         findViewById<AppCompatButton>(R.id.btn_sticky).setOnClickListener {
             LiveDataBus.with<String>("StickyData").setStickyData("发送了一条粘性事件")
+            startActivity(Intent(this, LiveDataTest3Activity::class.java))
+        }
+
+        findViewById<AppCompatButton>(R.id.btn_sticky_next).setOnClickListener {
+            LiveDataBus.with<String>("StickyDataNext").setStickyData("发送一条粘性事件")
             startActivity(Intent(this, LiveDataTest3Activity::class.java))
         }
 

@@ -1,5 +1,6 @@
 package zs.xmx.hi.training.livedata
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -33,6 +34,19 @@ class LiveDataTest3Activity : AppCompatActivity() {
             LiveDataBus.with<String>("forever").setStickyData("当前页面发送forever事件")
         }
 
+        findViewById<AppCompatButton>(R.id.btn_sticky_next).setOnClickListener {
+            LiveDataBus.with<String>("StickyDataNext").setStickyData("再发送一条粘性事件")
+            startActivity(Intent(this, LiveDataTest2Activity::class.java))
+            finish()
+        }
+
+        LiveDataBus.with<String>("StickyDataNext")
+            .observerSticky(this, true,
+                { t -> Log.e("跨页面测试", "onCreate StickyDataNext 参数返回： $t") })
+
+        /*
+           测试跨页面测试时,把以下noStickyData,StickyData,还有onResume()的注释以下，不然影响测试
+         */
         LiveDataBus.with<String>("noStickyData")
             .observerSticky(this, false,
                 { t -> Log.e(TAG, "onCreate noStickyData 参数返回： $t") })
@@ -44,14 +58,14 @@ class LiveDataTest3Activity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Handler(Looper.getMainLooper()).postDelayed(Runnable {
-            LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
-                Log.e(TAG, "onResume noStickyData 参数返回： $it")
-            })
-            LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
-                Log.e(TAG, "onResume StickyData 参数返回： $it")
-            })
-        }, 3000)
-
+        //注册多少个观察者,就能接受多少个消息
+        /* Handler(Looper.getMainLooper()).postDelayed(Runnable {
+             LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
+                 Log.e(TAG, "onResume noStickyData 参数返回： $it")
+             })
+             LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
+                 Log.e(TAG, "onResume StickyData 参数返回： $it")
+             })
+         }, 3000)*/
     }
 }

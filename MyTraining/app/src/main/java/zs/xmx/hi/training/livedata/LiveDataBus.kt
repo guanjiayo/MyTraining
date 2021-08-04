@@ -67,19 +67,14 @@ object LiveDataBus {
          * 对外暴露的observer() 方法
          */
         fun observerSticky(owner: LifecycleOwner, sticky: Boolean, observer: Observer<in T>) {
+            Log.e("跨页面测试","observerSticky()  owner: ${owner.javaClass.simpleName}")
             //允许指定注册的观察则 是否需要关心黏性事件
             //sticky =true, 如果之前存在已经发送的数据，那么这个observer会受到之前的黏性事件消息
             owner.lifecycle.addObserver(LifecycleEventObserver { source, event ->
                 //监听 宿主 发生销毁事件，主动把livedata 移除掉。
 
-                /*
-                   这种移除方式对粘性事件有影响,场景
-                   Activity A先发消息，进入Activity B，此时Activity B能够收到消息，
-                   但是LiveDataBus监听了Activity B宿主生命周期，当Activity B销毁时，LiveData也一并被移除了。
-                   此时再进入Activity C则无法收到粘性消息了。
-                   解决: 对宿主生命周期的监听去除,由分发消息的页面选择何时移除LiveData实例
-                 */
                 if (event == Lifecycle.Event.ON_DESTROY) {
+                    Log.e("跨页面测试", "$event  ${source.javaClass.simpleName}")
                     eventMap.remove(eventName)
                 }
             })
