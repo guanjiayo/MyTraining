@@ -1,13 +1,12 @@
 package zs.xmx.hi.training.livedata
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.Observer
 import zs.xmx.hi.training.R
-import java.util.*
 
 class LiveDataTestActivity : AppCompatActivity() {
 
@@ -29,7 +28,7 @@ class LiveDataTestActivity : AppCompatActivity() {
         }
 
         findViewById<AppCompatButton>(R.id.btn_sticky).setOnClickListener {
-            LiveDataBus.with<String>("StickyData").setStickyData("发送了一条粘性事件")
+            LiveDataBus.with<String>("StickyData").setStickyData("noStickyData Event")
             startActivity(Intent(this, LiveDataTest3Activity::class.java))
         }
 

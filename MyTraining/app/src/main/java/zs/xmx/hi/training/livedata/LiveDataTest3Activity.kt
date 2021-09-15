@@ -2,12 +2,9 @@ package zs.xmx.hi.training.livedata
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.lifecycle.Observer
 import zs.xmx.hi.training.R
 
 
@@ -45,16 +42,19 @@ class LiveDataTest3Activity : AppCompatActivity() {
             .observerSticky(this, true,
                 { t -> Log.e("跨页面测试", "onCreate StickyDataNext 参数返回： $t") })
 
+
+
         /*
            测试跨页面测试时,把以下noStickyData,StickyData,还有onResume()的注释以下，不然影响测试
          */
-        LiveDataBus.with<String>("noStickyData")
-            .observerSticky(this, false,
-                { t -> Log.e(TAG, "onCreate noStickyData 参数返回： $t") })
+        /*  LiveDataBus.with<String>("noStickyData")
+              .observerSticky(this, false,
+                  { t -> Log.e(TAG, "onCreate noStickyData 参数返回： $t") })
 
-        LiveDataBus.with<String>("StickyData")
-            .observerSticky(this, true,
-                { t -> Log.e(TAG, "onCreate StickyData 参数返回： $t") })
+          LiveDataBus.with<String>("StickyData")
+              .observerSticky(this, true,
+                  { t -> Log.e(TAG, "onCreate StickyData 参数返回： $t") })*/
+
     }
 
     override fun onResume() {

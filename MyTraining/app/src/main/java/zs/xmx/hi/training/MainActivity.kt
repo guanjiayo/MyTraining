@@ -13,6 +13,7 @@ import zs.xmx.hi.training.handler.HandlerActivity
 import zs.xmx.hi.training.lifecycle.LifecycleTestActivity
 import zs.xmx.hi.training.livedata.LiveDataTestActivity
 import zs.xmx.hi.training.slide_conflict.SlideConflictActivity
+import zs.xmx.hi.training.viewmodel.ViewModelActivity
 import zs.xmx.hi.training.webview.H5Activity
 import java.util.*
 
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         mList.add("WindowManage 悬浮窗测试")
         mList.add("生命周期")
         mList.add("LiveData测试")
+        mList.add("ViewModel测试")
     }
 
     private fun initView() {
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
             3 -> startActivity(Intent(this, FloatViewActivity::class.java))
             4 -> startActivity(Intent(this, LifecycleTestActivity::class.java))
             5 -> startActivity(Intent(this, LiveDataTestActivity::class.java))
+            6 -> startActivity(Intent(this, ViewModelActivity::class.java))
         }
     }
 

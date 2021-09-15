@@ -1,12 +1,10 @@
 package zs.xmx.hi.training.livedata
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.lifecycle.Observer
 import zs.xmx.hi.training.R
 
 /**
@@ -29,5 +27,6 @@ class LiveDataTest2Activity : AppCompatActivity() {
             startActivity(Intent(this, LiveDataTest3Activity::class.java))
             finish()
         }
+
     }
 }

@@ -1,20 +1,20 @@
 package zs.xmx.hi.training.livedata
 
 import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
 
 
 /**
  * Author: 默小铭
  * Blog:   https://blog.csdn.net/u012792686
- * Desc:   LiveData封装,避免粘性事件
+ * Desc:   LiveData封装,
+ *         1. 避免粘性事件
+ *         2. 实现了事件总线功能(其实就是用的粘性事件和forever)
  *
  */
+@Suppress("UNCHECKED_CAST", "unused")
 object LiveDataBus {
 
     private val eventMap = ConcurrentHashMap<String, StickyLiveData<*>>()
@@ -24,6 +24,7 @@ object LiveDataBus {
      * 由于一个livedata 只能发送 一种数据类型
      * 因此 不同的event事件,需要使用不同的livedata实例去分发
      */
+
     fun <T> with(eventName: String): StickyLiveData<T> {
         var liveData = eventMap[eventName]
         if (liveData == null) {
@@ -54,10 +55,11 @@ object LiveDataBus {
             super.setValue(value)
         }
 
-        override fun postValue(value: T) {
+        //postValue最终其实还是执行setValue方式
+        /*override fun postValue(value: T) {
             mVersion++
             super.postValue(value)
-        }
+        }*/
 
         override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
             observerSticky(owner, false, observer)
@@ -69,15 +71,17 @@ object LiveDataBus {
         fun observerSticky(owner: LifecycleOwner, sticky: Boolean, observer: Observer<in T>) {
             //Log.e("跨页面测试","observerSticky()  owner: ${owner.javaClass.simpleName}")
             //允许指定注册的观察则 是否需要关心黏性事件
-            //sticky =true, 如果之前存在已经发送的数据，那么这个observer会受到之前的黏性事件消息
-            owner.lifecycle.addObserver(LifecycleEventObserver { source, event ->
-                //监听 宿主 发生销毁事件，主动把livedata 移除掉。
-
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    Log.e("跨页面测试", "$event  ${source.javaClass.simpleName}")
-                    eventMap.remove(eventName)
-                }
-            })
+            //sticky =true, 如果之前存在已经发送的数据，那么这个observer会收到之前的黏性事件消息
+            //如果是粘性事件,仿照EventBus谁观察就谁接收
+            if (!sticky) {
+                owner.lifecycle.addObserver(LifecycleEventObserver { source, event ->
+                    //监听 宿主 发生销毁事件，主动把livedata 移除掉。
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        Log.e("跨页面测试", "$event  ${source.javaClass.simpleName}")
+                        eventMap.remove(eventName)
+                    }
+                })
+            }
             super.observe(owner, StickyObserver(this, sticky, observer))
         }
 

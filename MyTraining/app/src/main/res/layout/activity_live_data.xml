@@ -8,31 +8,31 @@
     tools:context=".livedata.LiveDataTestActivity">
 
     <androidx.appcompat.widget.AppCompatButton
-        android:textAllCaps="false"
         android:id="@+id/btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Handler与LiveData传递消息比较" />
+        android:text="Handler与LiveData传递消息比较"
+        android:textAllCaps="false" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:textAllCaps="false"
         android:id="@+id/btn_no_sticky"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LiveDataBus发送事件" />
+        android:text="LiveDataBus发送事件"
+        android:textAllCaps="false" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:textAllCaps="false"
         android:id="@+id/btn_sticky"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LiveDataBus发送粘性事件" />
+        android:text="LiveDataBus发送粘性事件"
+        android:textAllCaps="false" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:textAllCaps="false"
         android:id="@+id/btn_sticky_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LiveDataBus发送粘性事件(跨多页面测试)" />
+        android:text="LiveDataBus发送粘性事件(跨多页面测试)"
+        android:textAllCaps="false" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
