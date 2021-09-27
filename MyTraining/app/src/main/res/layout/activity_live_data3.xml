@@ -11,7 +11,7 @@
         android:id="@+id/btn_no_sticky"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LiveDataBus发送事件"
+        android:text="LiveDataBus发送非粘性事件"
         android:textAllCaps="false" />
 
     <androidx.appcompat.widget.AppCompatButton

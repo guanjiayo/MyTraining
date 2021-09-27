@@ -11,7 +11,7 @@ import zs.xmx.hi.training.R
 class LiveDataTestActivity : AppCompatActivity() {
 
     private val foreverObserver =
-        Observer<String> { Log.e("LiveDataTest3Activity", "forever 参数返回： $it") }
+        Observer<String> { Log.e("LiveDataTestCActivity", "forever 参数返回： $it") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,22 +19,22 @@ class LiveDataTestActivity : AppCompatActivity() {
 
 
         findViewById<AppCompatButton>(R.id.btn).setOnClickListener {
-            startActivity(Intent(this, LiveDataTest2Activity::class.java))
+            startActivity(Intent(this, LiveDataTestBActivity::class.java))
         }
 
         findViewById<AppCompatButton>(R.id.btn_no_sticky).setOnClickListener {
             LiveDataBus.with<String>("noStickyData").setStickyData("noStickyData Event")
-            startActivity(Intent(this, LiveDataTest3Activity::class.java))
+            startActivity(Intent(this, LiveDataTestCActivity::class.java))
         }
 
         findViewById<AppCompatButton>(R.id.btn_sticky).setOnClickListener {
-            LiveDataBus.with<String>("StickyData").setStickyData("noStickyData Event")
-            startActivity(Intent(this, LiveDataTest3Activity::class.java))
+            LiveDataBus.with<String>("StickyData").setStickyData("StickyData Event(粘性)")
+            startActivity(Intent(this, LiveDataTestCActivity::class.java))
         }
 
         findViewById<AppCompatButton>(R.id.btn_sticky_next).setOnClickListener {
             LiveDataBus.with<String>("StickyDataNext").setStickyData("发送一条粘性事件")
-            startActivity(Intent(this, LiveDataTest3Activity::class.java))
+            startActivity(Intent(this, LiveDataTestCActivity::class.java))
         }
 
         LiveDataBus.with<String>("forever").observeForever(foreverObserver)

@@ -27,8 +27,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".livedata.LiveDataTestActivity" />
-        <activity android:name=".livedata.LiveDataTest2Activity" />
-        <activity android:name=".livedata.LiveDataTest3Activity" />
+        <activity android:name=".livedata.LiveDataTestBActivity" />
+        <activity android:name=".livedata.LiveDataTestCActivity" />
         <activity android:name=".lifecycle.LifecycleTestActivity" />
         <activity android:name=".drift.FloatViewActivity" />
         <activity android:name=".webview.H5Activity" />

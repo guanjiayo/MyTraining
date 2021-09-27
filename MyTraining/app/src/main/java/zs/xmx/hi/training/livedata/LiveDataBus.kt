@@ -76,6 +76,7 @@ object LiveDataBus {
             if (!sticky) {
                 owner.lifecycle.addObserver(LifecycleEventObserver { source, event ->
                     //监听 宿主 发生销毁事件，主动把livedata 移除掉。
+                    //todo 有这个问题,如果说A发送事件,BCD接受,那么B接收到后就销毁了,CD就接受不到了
                     if (event == Lifecycle.Event.ON_DESTROY) {
                         Log.e("跨页面测试", "$event  ${source.javaClass.simpleName}")
                         eventMap.remove(eventName)

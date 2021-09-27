@@ -2,6 +2,8 @@ package zs.xmx.hi.training.livedata
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -12,10 +14,11 @@ import zs.xmx.hi.training.R
  * Author: 默小铭
  * Blog:   https://blog.csdn.net/u012792686
  * Desc:   LiveDataBus测试
- *         粘性事件,就是说,我们同时注册多个观察者,后面新注册的会收到之前注册的观察者接收到的消息 当前源码 onResume()可以模拟出来
+ *         粘性事件,就是说,我们同时注册多个观察者,后面新注册的会收到之前注册的观察者接收到的消息
+ *         当前源码 onResume()可以模拟出来  (倒计时未结束前多按几次发送粘性事件,如果onResume() 能收到为粘性,反之不粘)
  */
-class LiveDataTest3Activity : AppCompatActivity() {
-    private val TAG = "LiveDataTest3Activity"
+class LiveDataTestCActivity : AppCompatActivity() {
+    private val TAG = "LiveDataTestCActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +37,7 @@ class LiveDataTest3Activity : AppCompatActivity() {
 
         findViewById<AppCompatButton>(R.id.btn_sticky_next).setOnClickListener {
             LiveDataBus.with<String>("StickyDataNext").setStickyData("再发送一条粘性事件")
-            startActivity(Intent(this, LiveDataTest2Activity::class.java))
+            startActivity(Intent(this, LiveDataTestBActivity::class.java))
             finish()
         }
 
@@ -47,11 +50,11 @@ class LiveDataTest3Activity : AppCompatActivity() {
         /*
            测试跨页面测试时,把以下noStickyData,StickyData,还有onResume()的注释以下，不然影响测试
          */
-        /*  LiveDataBus.with<String>("noStickyData")
+       /*   LiveDataBus.with<String>("noStickyData")
               .observerSticky(this, false,
-                  { t -> Log.e(TAG, "onCreate noStickyData 参数返回： $t") })
+                  { t -> Log.e(TAG, "onCreate noStickyData 参数返回： $t") })*/
 
-          LiveDataBus.with<String>("StickyData")
+         /* LiveDataBus.with<String>("StickyData")
               .observerSticky(this, true,
                   { t -> Log.e(TAG, "onCreate StickyData 参数返回： $t") })*/
 
@@ -60,13 +63,13 @@ class LiveDataTest3Activity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //注册多少个观察者,就能接受多少个消息
-        /*Handler(Looper.getMainLooper()).postDelayed(Runnable {
-            LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+           /* LiveDataBus.with<String>("noStickyData").observerSticky(this, false, Observer {
                 Log.e(TAG, "onResume noStickyData 参数返回： $it")
-            })
-            LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
+            })*/
+           /* LiveDataBus.with<String>("StickyData").observerSticky(this, true, Observer {
                 Log.e(TAG, "onResume StickyData 参数返回： $it")
-            })
-        }, 3000)*/
+            })*/
+        }, 5000)
     }
 }

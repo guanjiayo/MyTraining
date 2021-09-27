@@ -13,7 +13,7 @@ import zs.xmx.hi.training.R
  * Desc:   LiveData,Handler发送消息对比测试
  *         当页面不可见,Handler/LiveData是否会继续发送消息
  */
-class LiveDataTest2Activity : AppCompatActivity() {
+class LiveDataTestBActivity : AppCompatActivity() {
     private val TAG = "跨页面测试"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,7 @@ class LiveDataTest2Activity : AppCompatActivity() {
 
         findViewById<AppCompatButton>(R.id.btn_sticky_next).setOnClickListener {
             LiveDataBus.with<String>("StickyDataNext").setStickyData("再发送一条粘性事件2")
-            startActivity(Intent(this, LiveDataTest3Activity::class.java))
+            startActivity(Intent(this, LiveDataTestCActivity::class.java))
             finish()
         }
 
