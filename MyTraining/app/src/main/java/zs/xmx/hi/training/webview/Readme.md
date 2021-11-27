@@ -11,8 +11,10 @@ WebView.evaluateJavaScript("javascript:js中的方法名",ValueCallback)。 这�
 - WebView.addJavascriptInterface()。 
 这是官方解决 js 调用 Android 方法的方案，需要注意的是要在供 js 调用的 Android 方法上加上 @JavascriptInterface 注解，以避免安全漏洞。
 这种方案的缺点是 Android4.2 以前会有安全漏洞，不过在 4.2 以后已经修复了。同样，在 2018 年来说，兼容性问题不大。
+
 - 重写 WebViewClient的shouldOverrideUrlLoading()方法来拦截url， 拿到 url 后进行解析，如果符合双方的规定，即可调用 Android 方法。
 优点是避免了 Android4.2 以前的安全漏洞，缺点也很明显，无法直接拿到调用 Android 方法的返回值，只能通过 Android 调用 js 方法来获取返回值。
+
 - 重写 WebChromClient 的 onJsPrompt() 方法，同前一个方式一样，拿到 url 之后先进行解析，如果符合双方规定，即可调用Android方法。
 最后如果需要返回值，通过 result.confirm("Android方法返回值") 即可将 Android 的返回值返回给 js。
 方法的优点是没有漏洞，也没有兼容性限制，同时还可以方便的获取 Android 方法的返回值。

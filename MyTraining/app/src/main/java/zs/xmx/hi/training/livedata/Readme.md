@@ -57,3 +57,6 @@ A->B finish 返回 A
 
 #### LiveData 练手
 [LiveData奇思妙用的 11 个场景总结~](https://mp.weixin.qq.com/s/013AABBND0XVXsOfY7dGuA)
+
+#### 实际开发,可以先用别人比较完善的框架
+[LiveEventBus](https://github.com/JeremyLiao/LiveEventBus)

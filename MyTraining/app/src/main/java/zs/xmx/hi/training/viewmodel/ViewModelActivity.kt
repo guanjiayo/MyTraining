@@ -30,6 +30,7 @@ class ViewModelActivity : AppCompatActivity() {
 
         val tvCount = findViewById<TextView>(R.id.tvCount)
         mViewModel.counter.observe(this, {
+            //横竖屏切换时会继续有回调
             tvCount.text = "$it"
         })
 

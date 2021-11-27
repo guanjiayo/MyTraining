@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".network.NetRequestActivity">
+
+    <Button
+        android:id="@+id/btn_request1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flow+LiveData"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_request2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flow 直接转 LiveData"
+        android:textAllCaps="false" />
+    <Button
+        android:id="@+id/btn_request3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="StateFlow 仿LiveData调用"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_request4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="StateFlow 仿LiveData调用 (直接返回密封类写法)"
+        android:textAllCaps="false" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

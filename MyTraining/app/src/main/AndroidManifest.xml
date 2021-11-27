@@ -35,6 +35,9 @@
         <activity android:name=".handler.HandlerActivity" />
         <activity android:name=".slide_conflict.SlideConflictActivity" />
         <activity android:name=".viewmodel.ViewModelActivity2" />
+        <activity android:name=".flow.operator.FlowOperatorActivity" />
+        <activity android:name=".flow.network.NetRequestActivity" />
+        <activity android:name=".flow.FlowTestActivity" />
     </application>
 
 </manifest>
