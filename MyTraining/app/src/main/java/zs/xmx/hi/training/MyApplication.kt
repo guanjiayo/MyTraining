@@ -1,6 +1,8 @@
 package zs.xmx.hi.training
 
 import android.app.Application
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 
 
 /**
@@ -9,9 +11,14 @@ import android.app.Application
  * Desc:
  *
  */
-class MyApplication : Application() {
+class MyApplication : Application(), ViewModelStoreOwner {
 
-    override fun onCreate() {
-        super.onCreate()
+    private val appViewModelStore: ViewModelStore by lazy {
+        ViewModelStore()
+    }
+
+
+    override fun getViewModelStore(): ViewModelStore {
+        return appViewModelStore
     }
 }
