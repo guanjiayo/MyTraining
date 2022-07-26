@@ -5,18 +5,34 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import zs.xmx.hi.training.R
 
-class ViewModelActivity : AppCompatActivity() {
 
-    //private val mViewModel by viewModels<CounterViewModel>()
-    private val mViewModel: CounterViewModel by applicationViewModels()
-   // private val mViewModel = ViewModelProvider(MyApplication()).get(CounterViewModel::class.java)
+class ViewModelActivity : BaseViewModelActivity() {
+
+    /**
+     * 方案三: kotlin扩展
+     */
+    //private val mViewModel: CounterViewModel by applicationViewModels()
+
+    companion object {
+        //方案一,跟随某个Activity的作用域
+        var mViewModelActivity: ViewModelActivity? = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_model)
+
+        //方案一,使用
+        /*mViewModelActivity = this
+        val mViewModel = ViewModelProvider(
+            mViewModelActivity!!
+        )[CounterViewModel::class.java]*/
+
+
+        //方案二,使用
+        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
 
         findViewById<Button>(R.id.plus).setOnClickListener {
             mViewModel.plusOne()
@@ -31,7 +47,7 @@ class ViewModelActivity : AppCompatActivity() {
         }
 
         val tvCount = findViewById<TextView>(R.id.tvCount)
-        Log.i("TestA", "count: ${mViewModel.count}")
+        Log.i("TestA", "count: ${mViewModel}")
         mViewModel.counter.observe(this) {
             //横竖屏切换时会继续有回调
             tvCount.text = "$it"

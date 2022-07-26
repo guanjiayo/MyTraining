@@ -13,12 +13,18 @@ import androidx.lifecycle.ViewModelStoreOwner
  */
 class MyApplication : Application(), ViewModelStoreOwner {
 
-    private val appViewModelStore: ViewModelStore by lazy {
-        ViewModelStore()
+    //    private val appViewModelStore: ViewModelStore by lazy {
+//        ViewModelStore()
+//    }
+    private lateinit var mAppViewModelStore: ViewModelStore
+
+    override fun onCreate() {
+        super.onCreate()
+        mAppViewModelStore = ViewModelStore()
     }
 
-
     override fun getViewModelStore(): ViewModelStore {
-        return appViewModelStore
+        //return appViewModelStore
+        return mAppViewModelStore
     }
 }

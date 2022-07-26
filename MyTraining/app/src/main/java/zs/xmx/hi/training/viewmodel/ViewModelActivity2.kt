@@ -4,24 +4,26 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import zs.xmx.hi.training.R
 
-class ViewModelActivity2 : AppCompatActivity() {
-
-    //private val mViewModel by viewModels<CounterViewModel>()
+class ViewModelActivity2 : BaseViewModelActivity() {
 
 
-//      private val mViewModel: CounterViewModel by applicationViewModels{
-//          ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-//      }
-      private val mViewModel: CounterViewModel by applicationViewModels()
+    //private val mViewModel: CounterViewModel by applicationViewModels()
 
-    //private val mViewModel = ViewModelProvider(MyApplication()).get(CounterViewModel::class.java)
+    /**
+     *  方案一,跟随某个Activity的作用域
+     */
+    /* val mViewModel = ViewModelProvider(
+         ViewModelActivity.mViewModelActivity!!
+     ).get(CounterViewModel::class.java)*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_model2)
+
+        //方案二使用
+        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
 
         findViewById<Button>(R.id.plus).setOnClickListener {
             mViewModel.plusOne()
@@ -37,7 +39,7 @@ class ViewModelActivity2 : AppCompatActivity() {
         }
 
         val tvCount = findViewById<TextView>(R.id.tvCount)
-        Log.i("TestA", "count---: ${mViewModel.count}")
+        Log.i("TestA", "count---: ${mViewModel}")
         mViewModel.counter.observe(this) {
             tvCount.text = "$it"
         }
