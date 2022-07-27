@@ -9,7 +9,10 @@ import zs.xmx.hi.training.R
 class ViewModelActivity2 : BaseViewModelActivity() {
 
 
-    //private val mViewModel: CounterViewModel by applicationViewModels()
+    /**
+     * 方案三: kotlin扩展
+     */
+    private val mViewModel: CounterViewModel by applicationViewModels()
 
     /**
      *  方案一,跟随某个Activity的作用域
@@ -23,7 +26,7 @@ class ViewModelActivity2 : BaseViewModelActivity() {
         setContentView(R.layout.activity_view_model2)
 
         //方案二使用
-        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
+//        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
 
         findViewById<Button>(R.id.plus).setOnClickListener {
             mViewModel.plusOne()

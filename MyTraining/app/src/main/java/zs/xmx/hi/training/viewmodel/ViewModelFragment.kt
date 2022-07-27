@@ -17,6 +17,10 @@ import zs.xmx.hi.training.R
  */
 class ViewModelFragment : BaseViewModelFragment() {
 
+    /**
+     * 方案三: kotlin扩展
+     */
+    private val mViewModel: CounterViewModel by applicationViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,7 +34,7 @@ class ViewModelFragment : BaseViewModelFragment() {
 
     private fun initEvent(rootView: View) {
         //方案二使用
-        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
+        //val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
 
         rootView.findViewById<Button>(R.id.plus).setOnClickListener {
             mViewModel.plusOne()

@@ -13,7 +13,7 @@ class ViewModelActivity : BaseViewModelActivity() {
     /**
      * 方案三: kotlin扩展
      */
-    //private val mViewModel: CounterViewModel by applicationViewModels()
+    private val mViewModel: CounterViewModel by applicationViewModels()
 
     companion object {
         //方案一,跟随某个Activity的作用域
@@ -32,7 +32,7 @@ class ViewModelActivity : BaseViewModelActivity() {
 
 
         //方案二,使用
-        val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
+        //val mViewModel = getApplicationScopeViewModel(CounterViewModel::class.java)
 
         findViewById<Button>(R.id.plus).setOnClickListener {
             mViewModel.plusOne()
