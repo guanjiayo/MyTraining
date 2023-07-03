@@ -40,13 +40,13 @@ class NetRequestActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-        mViewModel.livedataObs.observe(this, {
+        mViewModel.livedataObs.observe(this) {
             Toast.makeText(this, "请求成功,  size: ${it.size}", Toast.LENGTH_SHORT).show()
-        })
+        }
 
-        mViewModel.livedataExtObs.observe(this, {
+        mViewModel.livedataExtObs.observe(this) {
             Toast.makeText(this, "请求成功,  size: ${it.size}", Toast.LENGTH_SHORT).show()
-        })
+        }
 
 
         lifecycleScope.launch {
