@@ -12,8 +12,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import zs.xmx.hi.training.R
-import zs.xmx.hi.training.lifecycle.LifecycleObserverTest
-import zs.xmx.hi.training.lifecycle.LocationObserver
 
 
 /**

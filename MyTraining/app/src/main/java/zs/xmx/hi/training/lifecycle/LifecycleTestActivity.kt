@@ -12,7 +12,6 @@ class LifecycleTestActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        lifecycle.addObserver(LifecycleObserverTest())
-        //lifecycle.addObserver(LocationObserver())
+        lifecycle.addObserver(LocationObserver())
     }
 }
