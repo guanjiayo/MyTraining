@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace = "zs.xmx.hi.training"
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 

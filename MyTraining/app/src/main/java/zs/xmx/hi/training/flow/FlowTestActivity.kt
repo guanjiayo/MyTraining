@@ -62,19 +62,18 @@ class FlowTestActivity : AppCompatActivity() {
             //2. repeatOnLifecycle 配置宿主在 STARTED 状态时执行操作,超出这个状态后该协程会自动取消
             //repeatOnLifecycle API 仅在 androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01 库及更高版本中提供。
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    mStateFlowViewModel.uiState.collect {
-                        Log.i(tag, "数据:  $it  宿主状态:  ${lifecycle.currentState}")
-                    }
+                mStateFlowViewModel.uiState.collect {
+                    Log.i(tag, "数据:  $it  宿主状态:  ${lifecycle.currentState}")
                 }
+            }
+        }
 
-                launch {
-                    mStateFlowMediatorViewModel.flow.collect {
-                        Log.i(tag, "数量:  $it  ${lifecycle.currentState}")
-                        findViewById<TextView>(R.id.tv_flow_count).text = "数量: $it"
-                    }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mStateFlowMediatorViewModel.flow.collect {
+                    Log.i(tag, "数量:  $it  ${lifecycle.currentState}")
+                    findViewById<TextView>(R.id.tv_flow_count).text = "数量: $it"
                 }
-
             }
         }
 

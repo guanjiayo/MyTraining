@@ -18,7 +18,10 @@ class FlowOperatorActivity : AppCompatActivity() {
         //mViewModel.channelFlow()
         //mViewModel.flowMapNested()
         //mViewModel.flattenConcat()
-        mViewModel.catch()
+        //mViewModel.catch()
+        //mViewModel.lifecycleOnFlow()
+        //mViewModel.threadOnFlow()
+        mViewModel.launchInOnFlow()
 
     }
 

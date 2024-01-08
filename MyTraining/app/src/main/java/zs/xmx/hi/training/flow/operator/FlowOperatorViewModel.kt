@@ -15,6 +15,12 @@ import kotlinx.coroutines.flow.*
  */
 class FlowOperatorViewModel : ViewModel() {
 
+    /**
+     * Flow 流展平(两个流之间的交互操作)
+     * FlowA.flatMapConcat(FlowB) 连接模式
+     * 1. FlowA与FlowB连接后,个数为 A x B 个
+     * 2. A 的元素顺序为主导,如下打印为 A(B间隔2.5秒B1) 间隔一秒A1(B2间隔2.5秒B3)
+     */
     @FlowPreview
     fun flatMapConcat() = viewModelScope.launch {
         flow {
@@ -38,7 +44,7 @@ class FlowOperatorViewModel : ViewModel() {
     }
 
     /**
-     * Flow 嵌套 (应该不建议这么搞)
+     * Flow 嵌套 (可以但不建议这么搞,可读性较差)
      */
     fun flowNested() = viewModelScope.launch {
         flow {
@@ -114,12 +120,14 @@ class FlowOperatorViewModel : ViewModel() {
 
     }
 
+    //-------------------------Flow 异常处理--------------------------------------
+
     /**
      * Flow 异常处理
      *
      * 1. 如果只写 onCompletion() 不写 catch() ,程序会抛异常
      * 2. catch() 不能放在 onCompletion() 后面, 程序会抛异常
-     * 3. catch() 只会捕获上游异常
+     * 3. catch() 只会捕获上游异常,如果是下游,或者想外部处理异常,智能在flow外部代码,try{}catch{}
      * 4. flow{}catch{}onCompletion{} 关系类似  try{}catch{}finally{},
      * 5. 不建议在Flow内部使用 try{}catch{}finally{}
      *
@@ -141,29 +149,81 @@ class FlowOperatorViewModel : ViewModel() {
         }
     }
 
-    /*  onEach() 在笔记记录下,不演示了
-        用于分离 Flow 的消费和触发
-        fun createFlow() = flow<Int> {
-    (1..3).forEach {
-      emit(it)
-      delay(100)
-    }
-  }.onEach { println(it) }
+    //-------------------------Flow 生命周期--------------------------------------
 
-fun main(){
-  GlobalScope.launch {
-    createFlow().collect()
-  }
-}
-
+    /**
+     * onEach 流程操作符,可以理解为遍历某个阶段的接果
+     * 可以继续再后面加操作符,而collect()就完全结束了
      */
+    fun lifecycleOnFlow() = viewModelScope.launch {
+        flow {
+            (1..3).forEach {
+                Log.i(TAG, "Emitting $it")
+                emit(it)
+                delay(1000)
+            }
+        }
+            .onStart { Log.i(TAG, "onStart") }
+            .onEach {
+                Log.i(TAG, "onEach $it")
+            }.onCompletion {
+                Log.i(TAG, "onCompletion")
+            }.collect {
+                Log.d(TAG, "collect  $it")
+            }
+    }
 
+    //-------------------------Flow 切换线程--------------------------------------
 
+    /**
+     * flowOn 主要用于切换上游的线程
+     */
+    fun threadOnFlow() = viewModelScope.launch {
+        flow {
+            Log.i(TAG, "start ${Thread.currentThread()}")
+            emit(1)
+            Log.i(TAG, "Emit: 1 ${Thread.currentThread()}")
+            emit(2)
+            Log.i(TAG, "Emit: 2 ${Thread.currentThread()}")
+            emit(3)
+            Log.i(TAG, "Emit: 3 ${Thread.currentThread()}")
+        }.filter {
+            Log.i(TAG, "Filter: $it ${Thread.currentThread()}")
+            it > 2
+        }.flowOn(Dispatchers.IO)//上游的都是子线程
+            .collect {
+                Log.i(TAG, "collect: $it ${Thread.currentThread()}")//主线程
+            }
+    }
+
+    /**
+     * launchIn 上下游都切换线程
+     */
+    fun launchInOnFlow() {
+        val scope = CoroutineScope(Dispatchers.Main)
+        flow {
+            Log.i(TAG, "start ${Thread.currentThread()}")
+            emit(1)
+            Log.i(TAG, "Emit: 1 ${Thread.currentThread()}")
+            emit(2)
+            Log.i(TAG, "Emit: 2 ${Thread.currentThread()}")
+            emit(3)
+            Log.i(TAG, "Emit: 3 ${Thread.currentThread()}")
+        }.flowOn(Dispatchers.Main)  //flow 在main线程
+            .filter {
+                Log.i(TAG, "Filter: $it ${Thread.currentThread()}")
+                it > 2
+            }
+            .flowOn(Dispatchers.IO)//filter 在子线程
+            .onEach {
+                Log.i(TAG, "onEach: $it ${Thread.currentThread()}")
+            }
+            .launchIn(scope)//onEach在主线程
+    }
 
     companion object {
         val TAG = "FlowOperator"
     }
-
 
 
 }
