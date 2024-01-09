@@ -2,9 +2,52 @@ package zs.xmx.hi.training.flow.operator
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flattenConcat
+import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.reduce
+import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.flow.runningReduce
+import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import zs.xmx.hi.training.model.Person
 
 
 /**
@@ -14,6 +57,402 @@ import kotlinx.coroutines.flow.*
  *
  */
 class FlowOperatorViewModel : ViewModel() {
+
+    //-------------------------Flow 变换操作符---------------------------------------------
+
+    /**
+     * map 变换操作符,转换数据类型
+     */
+    fun mapOnFlow() = viewModelScope.launch {
+        flow {
+            emit(100)
+        }.map {
+            "变成String $it"
+        }.collect {
+            Log.i(TAG, it)
+        }
+    }
+
+    /**
+     * transform 变换操作符,转换数据类型
+     *  区别map,接收者是FlowCollector,可以多次发送
+     */
+    fun transformOnMap() = viewModelScope.launch {
+        val flow = flowOf("Apple", "Banana", "Cherry", "Durian", "Elderberry")
+
+        val transformedFlow = flow.transform { value ->
+            if (value.length <= 5) {
+                emit(value.length) // 小于等于5的字符串的长度
+            }
+        }
+        val totalLength = transformedFlow.reduce { accumulator, value ->
+            accumulator + value // 统计长度的总和
+        }
+
+        Log.i(TAG, "Total length: $totalLength")
+    }
+
+    /**
+     * withIndex 变换操作符,给上游数据添加下标
+     *  区别 collectIndexed, 前者在中游处理,后者在下游处理
+     */
+    fun withIndexOnMap() = viewModelScope.launch {
+        flow {
+            emit("a")
+            emit("b")
+        }.withIndex()
+            .collect {
+                Log.i(TAG, "withIndex: ${it.index}  :  ${it.value}")
+            }
+    }
+
+    /**
+     * scan 变换操作符
+     * 把每一步操作的结果,和发送的值返回(需要穿初始值)
+     * 与 fold 相似,但scan操作中游,fold操作下游
+     */
+    fun scanOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3).scan(0) { acc, value ->
+            //acc 是上一步操作的结果， value 是发射的值
+            Log.i(TAG, "acc: $acc  ,  value: $value")
+            acc + value
+        }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * runningFold 变换操作符
+     * 把每一步操作的结果,和发送的值返回(需要穿初始值)
+     * 与 scan 相似,只是返回的是flow
+     */
+    fun runningFoldOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3).runningFold(0) { acc, value ->
+            //acc 是上一步操作的结果， value 是发射的值
+            Log.i(TAG, "acc: $acc  ,  value: $value")
+            acc + value
+        }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * runningReduce 变换操作符
+     * 把每一步操作的结果,和发送的值返回(不需要穿初始值)
+     * 与 runningFold 相似,只是不需要返回值
+     */
+    fun runningReduceOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3).runningReduce { acc, value ->
+            //acc 是上一步操作的结果， value 是发射的值
+            Log.i(TAG, "acc: $acc  ,  value: $value")
+            acc + value
+        }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    //-----------------------Flow 冷流转热流-----------------------------------------------
+
+    //todo shareIn  , stateIn
+    /**
+     * shareIn , 将Flow冷流转换成 SharedFlow类型的热流对象
+     */
+
+    /**
+     * stateIn , 将Flow冷流转换成 StateFlow类型的热流对象
+     */
+
+
+    //-----------------------Flow 过滤操作符-----------------------------------------------
+
+    /**
+     * filter 过滤操作符
+     * 筛选符合条件的值
+     */
+    fun filterOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3, 4, 5, 6)
+            .filter { it > 3 }
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * filter 过滤操作符
+     * 筛选不符合条件的值
+     */
+    fun filterNotOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3, 4, 5, 6)
+            .filterNot { it > 3 }
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * filter 过滤操作符
+     * 筛选对应类型的值
+     */
+    fun filterIsInstanceOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3, 4, 5, 6, "啊", "b", "c")
+            .filterIsInstance<String>()
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * filter 过滤操作符
+     * 筛选不为null的值
+     */
+    fun filterNotNullOnFlow() = viewModelScope.launch {
+        flow {
+            emit("a")
+            emit(null)
+            emit("b")
+        }
+            .filterNotNull()
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+
+    /**
+     * drop 过滤操作符
+     * 丢弃前 n 个的值
+     */
+    fun dropOnFlow() = viewModelScope.launch {
+        flow {
+            emit(1)
+            emit(2)
+            emit(3)
+            emit(4)
+            emit(5)
+        }.drop(4)
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * dropWhile 过滤操作符
+     * 找到第一个不满足条件的,返回其和其之后的值
+     */
+    fun dropWhileOnFlow() = viewModelScope.launch {
+        flow {
+            emit(3)
+            emit(3)
+            emit(1)
+            emit(5)
+            emit(4)
+        }.dropWhile { it == 3 }
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * take 过滤操作符
+     * 返回前 n 个元素
+     */
+    fun takeOnFlow() = viewModelScope.launch {
+        flow {
+            emit(1)
+            emit(2)
+            emit(3)
+        }.take(2).collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * takeWhile 过滤操作符
+     * 找到第一个不满足条件的项,但取之前的值
+     */
+    fun takeWhileOnFlow() = viewModelScope.launch {
+        flow {
+            emit(5)
+            emit(1)
+            emit(2)
+            emit(3)
+            emit(4)
+            emit(5)
+        }.takeWhile { it < 3 }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * debounce 过滤操作符
+     * 防止抖动,一定时间内只接受最新的一个,其他过滤掉(一般用在搜索联想)
+     */
+    fun debounceOnFlow() = viewModelScope.launch {
+        flow {
+            emit(1)
+            delay(90)
+            emit(2)
+            delay(90)
+            emit(3)
+            delay(1010)
+            emit(4)
+            delay(1010)
+            emit(5)
+        }.debounce(1000)
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * debounce 过滤操作符
+     * 防止抖动,一定时间内只接受最新的一个,其他过滤掉(一般用在搜索联想)
+     * 这里演示动态设置时间
+     */
+    fun debounce2OnFlow() = viewModelScope.launch {
+        flow {
+            emit(1)
+            delay(90)
+            emit(2)
+            delay(90)
+            emit(3)
+            delay(1010)
+            emit(4)
+            delay(1010)
+            emit(5)
+        }.debounce {
+            if (it == 1) {
+                0L
+            } else {
+                1000L
+            }
+        }
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+
+    /**
+     * sample 过滤操作符
+     * 给定一个时间周期,仅获取周期内最新发出的值
+     */
+    fun sampleOnFlow() = viewModelScope.launch {
+        flow {
+            repeat(10) {
+                emit(it)
+                delay(110)
+            }
+        }.sample(200)
+    }
+
+    /**
+     * distinctUntilChangedBy 过滤操作符
+     * 判断连续的两个值是否重复,重复的去重
+     */
+    fun distinctUntilChangedByOnFlow() = viewModelScope.launch {
+        flowOf(
+            Person("张三", 18),
+            Person("李四", 18),
+            Person("王五", 20)
+        ).distinctUntilChangedBy {
+            it.age
+        }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * distinctUntilChanged 过滤操作符
+     * 判断连续的两个值是否重复,重复的去重
+     * distinctUntilChangedByOnFlow的简化版
+     */
+    fun distinctUntilChangedOnFlow() = viewModelScope.launch {
+        flowOf(
+            1, 1, 2, 2, 3, 5, 7
+        ).distinctUntilChanged()
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    //-----------------------Flow 组合操作符-----------------------------------------------
+
+    /**
+     * combine 组合操作符
+     * 组合每个流最新发出的值(受时间影响)
+     */
+    fun combineOnFlow() = viewModelScope.launch {
+        val flow = flowOf(1, 2).onEach { delay(10) }
+        val flow2 = flowOf("a", "b", "c").onEach { delay(15) }
+        flow.combine(flow2) { i, s ->
+            "$i$s"
+        }.collect {
+            //1a 2a 2b 2c
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * combineTransform 组合操作符
+     * 组合每个流最新发出的值(受时间影响)
+     * 与 combine 差不多,只是数据处理有点区别
+     */
+    fun combineTransformOnFlow() = viewModelScope.launch {
+        val flow = flowOf(1, 2).onEach { delay(10) }
+        val flow2 = flowOf("a", "b", "c").onEach { delay(15) }
+        flow.combineTransform(flow2) { i, s ->
+            emit("$i$s")
+        }.collect {
+            //1a 2a 2b 2c
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     * flattenConcat 组合操作符
+     * 按顺序合并流
+     */
+    @OptIn(FlowPreview::class)
+    fun flattenConcatOnFlow() = viewModelScope.launch {
+        val flow = flowOf(1, 2, 3)
+        val flow2 = flowOf("a", "b", "c")
+        flowOf(flow, flow2)
+            .flattenConcat()
+            .collect {
+                Log.i(TAG, "collect: $it")
+            }
+    }
+
+    /**
+     * flatMapConcat 组合操作符
+     * map(transform).flattenConcat()的快捷方式
+     * 先转换,再合并flow
+     */
+    @OptIn(FlowPreview::class)
+    fun flatMapConcatOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3).flatMapConcat {
+            flowOf("$it map")
+        }.collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
+     *
+     */
+    @OptIn(FlowPreview::class)
+    fun flattenMergeOnFlow() = viewModelScope.launch {
+        flow {
+            emit(flowOf(1, 2, 3).flowOn(Dispatchers.IO))
+            emit(flowOf(4, 5, 6).flowOn(Dispatchers.IO))
+            emit(flowOf(7, 8, 9).flowOn(Dispatchers.IO))
+        }.flattenMerge(3).collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    //----------------------------------------------------------------------
 
     /**
      * Flow 流展平(两个流之间的交互操作)
@@ -60,7 +499,7 @@ class FlowOperatorViewModel : ViewModel() {
     }
 
     /**
-     * Flow 结合map 嵌套
+     * Flow 结合map 嵌套 (可以但不建议这么搞,可读性较差)
      *
      * map 块再实现 Flow,其实就把 Flow<T> 变成了 Flow<Flow<T>>
      */
@@ -76,36 +515,16 @@ class FlowOperatorViewModel : ViewModel() {
         }
     }
 
-    /**
-     *  flattenConcat()
-     *
-     * 承接flowMapNested()  ,将Flow<Flow<T>> 拼接起来返回 T
-     *
-     * flattenConcat 是按顺序拼接的,如果使用 flattenMerge 是并发的
-     */
-    fun flattenConcat() = viewModelScope.launch {
-        flow {
-            //模拟网络请求一
-            delay(1000)
-            emit(5)
-        }.map {
-            flow {
-                //模拟网络请求二
-                delay(2000)
-                emit("$it")
-            }
-        }.flattenConcat()
-            .collect {
-                Log.i(TAG, "flattenConcat() --> $it.")
-            }
-    }
+
 
     /**
     Flow 中无法随意切换调度器,因为emit函数不是线程安全的
     想要生成元素时切换调度器,需要使用 channelFlow 创建 Flow
+    (一般不要在 Flow 内部用withContext切换线程,要用flowOn或launchIn)
      */
     @ExperimentalCoroutinesApi
     fun channelFlow() = viewModelScope.launch {
+
         channelFlow {
             send(1)
             Log.i(TAG, "send1  ${Thread.currentThread().name}")

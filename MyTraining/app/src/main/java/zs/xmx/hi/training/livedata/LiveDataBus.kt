@@ -103,7 +103,7 @@ object LiveDataBus {
                 //observer的数据和LiveData的数据一样,没有最新的了,与源码类似
                 if (lastVersion >= stickyLiveData.mVersion) {
                     if (sticky && stickyLiveData.mStickyData != null) {
-                        observer.onChanged(stickyLiveData.mStickyData)
+                        observer.onChanged(stickyLiveData.mStickyData!!)
                     }
                     return
                 }

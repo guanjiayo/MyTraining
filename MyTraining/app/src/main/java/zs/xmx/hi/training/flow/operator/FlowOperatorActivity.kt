@@ -13,6 +13,21 @@ class FlowOperatorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flow_operator)
 
+        //mViewModel.mapOnFlow()
+        //mViewModel.transformOnMap()
+        //mViewModel.withIndexOnMap()
+        //mViewModel.scanOnFlow()
+        //mViewModel.dropOnFlow()
+        // mViewModel.dropWhileOnFlow()
+        // mViewModel.takeOnFlow()
+        //mViewModel.takeWhileOnFlow()
+        //mViewModel.debounceOnFlow()
+        //mViewModel.distinctUntilChangedByOnFlow()
+        //mViewModel.distinctUntilChangedOnFlow()
+        //mViewModel.combineOnFlow()
+        //mViewModel.combineTransformOnFlow()
+        //mViewModel.flattenConcatOnFlow()
+        mViewModel.flattenMergeOnFlow()
         //mViewModel.flatMapConcat()
         //mViewModel.flowNested()
         //mViewModel.channelFlow()
@@ -21,7 +36,7 @@ class FlowOperatorActivity : AppCompatActivity() {
         //mViewModel.catch()
         //mViewModel.lifecycleOnFlow()
         //mViewModel.threadOnFlow()
-        mViewModel.launchInOnFlow()
+        //mViewModel.launchInOnFlow()
 
     }
 

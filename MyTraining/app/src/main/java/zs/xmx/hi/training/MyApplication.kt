@@ -23,8 +23,6 @@ class MyApplication : Application(), ViewModelStoreOwner {
         mAppViewModelStore = ViewModelStore()
     }
 
-    override fun getViewModelStore(): ViewModelStore {
-        //return appViewModelStore
-        return mAppViewModelStore
-    }
+    override val viewModelStore: ViewModelStore
+        get() = mAppViewModelStore
 }

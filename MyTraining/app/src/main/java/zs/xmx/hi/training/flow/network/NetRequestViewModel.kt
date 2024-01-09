@@ -52,9 +52,10 @@ class NetRequestViewModel : ViewModel() {
 
     private val _livedataExtObs = MutableLiveData<Boolean>()
 
-    val livedataExtObs = Transformations.switchMap(_livedataExtObs) {
+    val livedataExtObs = _livedataExtObs.switchMap {
         getDogImagesLiveData(it)
     }
+
 
     fun getDogImages2(isSuccess: Boolean) {
         _livedataExtObs.value = isSuccess
