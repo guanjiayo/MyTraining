@@ -9,11 +9,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -24,6 +26,8 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
@@ -45,6 +49,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import zs.xmx.hi.training.model.Person
@@ -150,18 +155,6 @@ class FlowOperatorViewModel : ViewModel() {
             Log.i(TAG, "collect: $it")
         }
     }
-
-    //-----------------------Flow 冷流转热流-----------------------------------------------
-
-    //todo shareIn  , stateIn
-    /**
-     * shareIn , 将Flow冷流转换成 SharedFlow类型的热流对象
-     */
-
-    /**
-     * stateIn , 将Flow冷流转换成 StateFlow类型的热流对象
-     */
-
 
     //-----------------------Flow 过滤操作符-----------------------------------------------
 
@@ -287,6 +280,7 @@ class FlowOperatorViewModel : ViewModel() {
      * debounce 过滤操作符
      * 防止抖动,一定时间内只接受最新的一个,其他过滤掉(一般用在搜索联想)
      */
+    @OptIn(FlowPreview::class)
     fun debounceOnFlow() = viewModelScope.launch {
         flow {
             emit(1)
@@ -309,6 +303,7 @@ class FlowOperatorViewModel : ViewModel() {
      * 防止抖动,一定时间内只接受最新的一个,其他过滤掉(一般用在搜索联想)
      * 这里演示动态设置时间
      */
+    @OptIn(FlowPreview::class)
     fun debounce2OnFlow() = viewModelScope.launch {
         flow {
             emit(1)
@@ -337,6 +332,7 @@ class FlowOperatorViewModel : ViewModel() {
      * sample 过滤操作符
      * 给定一个时间周期,仅获取周期内最新发出的值
      */
+    @OptIn(FlowPreview::class)
     fun sampleOnFlow() = viewModelScope.launch {
         flow {
             repeat(10) {
@@ -410,6 +406,19 @@ class FlowOperatorViewModel : ViewModel() {
     }
 
     /**
+     * merge 组合操作符
+     * 合并多个流,并行,顺序不固定
+     */
+    fun mergeOnFlow() = viewModelScope.launch {
+        val numberFlow = flowOf(1, 2).onEach { delay(10) }
+        val stringFlow = flowOf("a", "b", "c").onEach { delay(15) }
+
+        listOf(numberFlow, stringFlow).merge().collect {
+            Log.i(TAG, "collect: $it")
+        }
+    }
+
+    /**
      * flattenConcat 组合操作符
      * 按顺序合并流
      */
@@ -422,6 +431,24 @@ class FlowOperatorViewModel : ViewModel() {
             .collect {
                 Log.i(TAG, "collect: $it")
             }
+
+        listOf(flow, flow2).merge()
+    }
+
+    /**
+     * flattenMerge 组合操作符
+     * 当等于1时,和flattenConcat一样
+     * 大于1时,并发收集,顺序不固定
+     */
+    @OptIn(FlowPreview::class)
+    fun flattenMergeOnFlow() = viewModelScope.launch {
+        flow {
+            emit(flowOf(1, 2, 3).flowOn(Dispatchers.IO))
+            emit(flowOf(4, 5, 6).flowOn(Dispatchers.IO))
+            emit(flowOf(7, 8, 9).flowOn(Dispatchers.IO))
+        }.flattenMerge(3).collect {
+            Log.i(TAG, "collect: $it")
+        }
     }
 
     /**
@@ -439,48 +466,61 @@ class FlowOperatorViewModel : ViewModel() {
     }
 
     /**
+     * flatMapLatest 组合操作符
+     * 内部就是transformLatest + emitAll
+     * 如果下个值来了,之前的变换没结束,就取消掉
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun flatMapLastOnFlow() = viewModelScope.launch {
+        flow {
+            emit("a")
+            delay(100)
+            emit("b")
+        }.flatMapLatest { value ->
+            flow {
+                emit(value)
+                delay(200)
+                emit(value + "_last")
+            }
+        }.collect { value ->
+            //a b b_last
+            Log.i(TAG, "collect: $value")
+        }
+    }
+
+    /**
+     * flatMapMerge 组合操作符
+     * map + flattenMerge的简化写法
      *
      */
     @OptIn(FlowPreview::class)
-    fun flattenMergeOnFlow() = viewModelScope.launch {
-        flow {
-            emit(flowOf(1, 2, 3).flowOn(Dispatchers.IO))
-            emit(flowOf(4, 5, 6).flowOn(Dispatchers.IO))
-            emit(flowOf(7, 8, 9).flowOn(Dispatchers.IO))
-        }.flattenMerge(3).collect {
-            Log.i(TAG, "collect: $it")
-        }
+    fun flatMapMergeOnFlow() = viewModelScope.launch {
+        flowOf(1, 2, 3, 4)
+            .flatMapMerge(3) { value ->
+                flowOf("$value map").flowOn(Dispatchers.IO)
+            }.collect { value ->
+                Log.i(TAG, "collect: $value")
+            }
     }
-
-    //----------------------------------------------------------------------
 
     /**
-     * Flow 流展平(两个流之间的交互操作)
-     * FlowA.flatMapConcat(FlowB) 连接模式
-     * 1. FlowA与FlowB连接后,个数为 A x B 个
-     * 2. A 的元素顺序为主导,如下打印为 A(B间隔2.5秒B1) 间隔一秒A1(B2间隔2.5秒B3)
+     * zip 组合操作符
+     * 对两个流进行组合,一旦一个流结束了,那整个过程就结束了
      */
-    @FlowPreview
-    fun flatMapConcat() = viewModelScope.launch {
-        flow {
-            delay(1000)
-            emit(1)
-            delay(1000)
-            emit(2)
-            delay(1000)
-            emit(3)
-            delay(1000)
-            emit(4)
-        }.flatMapConcat {
-            flow {
-                emit("$it 产生第一个flow值")
-                delay(2500)
-                emit("$it 产生第二个flow值")
-            }
-        }.collect { value ->
-            Log.i(TAG, value)
+    fun zipOnFlow() = viewModelScope.launch {
+        val flow = flowOf(1, 2, 3).onEach { delay(10) }
+
+        val flow2 = flowOf("a", "b", "c", "d").onEach { delay(15) }
+
+        flow.zip(flow2) { i, s -> i.toString() + s }.collect {
+            //1a 2b 3c
+            Log.i(TAG, "collect: $it")
         }
+
     }
+
+
+    //----------------------------------------------------------------------
 
     /**
      * Flow 嵌套 (可以但不建议这么搞,可读性较差)
@@ -514,7 +554,6 @@ class FlowOperatorViewModel : ViewModel() {
             Log.i(TAG, "flowMapNested() --> $it.")
         }
     }
-
 
 
     /**
@@ -639,6 +678,56 @@ class FlowOperatorViewModel : ViewModel() {
             }
             .launchIn(scope)//onEach在主线程
     }
+
+    //-------------------------Flow 缓冲区--------------------------------------
+
+    /**
+     * buffer
+     * 提供缓存区等待数据处理,
+     * 如果操作比较耗时,可用buffer在执行期间创建一个单独的协程
+     */
+    fun bufferOnFlow() = viewModelScope.launch {
+        //这个例子可见是一发一收
+        flowOf("A", "B", "C")
+            .onEach {
+                delay(100)
+                Log.i(TAG, "onEach 1$it")
+            }
+            .collect {
+                delay(300)
+                Log.i(TAG, "collect 2$it")
+            }
+
+        //从这个例子可见,直接发送2个元素到缓冲区,当缓存区元素被消费了,又把后续的元素放到缓存区
+        flowOf("a", "b", "c")
+            .onEach {
+                delay(100)
+                Log.d(TAG, "--- onEach 1$it")
+            }
+            .buffer(2)
+            .collect {
+                delay(300)
+                Log.d(TAG, "--- collect 2$it")
+            }
+
+    }
+
+    /**
+     * conflate
+     * 内部就是 buffer(CONFLATED)
+     * 当生产者比消费者慢时,消费者跳过这些元素,只处理最新,从而加快处理速度
+     */
+    fun conflateOnFlow() = viewModelScope.launch {
+        flow {
+            repeat(30) {
+                delay(100)
+                emit(it)
+            }
+        }.conflate().onEach { delay(1000) }.collect { value ->
+            Log.i(TAG, "collect $value")
+        }
+    }
+
 
     companion object {
         val TAG = "FlowOperator"
