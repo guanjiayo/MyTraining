@@ -12,6 +12,12 @@
         android:orientation="vertical"
         tools:context=".FlowTestActivity">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="StateFlow 测试" />
+
         <Button
             android:id="@+id/btn_stateflow"
             android:layout_width="wrap_content"
@@ -23,6 +29,12 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/action_stateFlow_batch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="StateFlow 模拟大数据传参"
+            android:textAllCaps="false" />
 
         <View
             android:layout_width="match_parent"
@@ -140,6 +152,13 @@
             android:layout_height="wrap_content"
             android:text="Flow 网络请求"
             android:textAllCaps="false" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/black" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

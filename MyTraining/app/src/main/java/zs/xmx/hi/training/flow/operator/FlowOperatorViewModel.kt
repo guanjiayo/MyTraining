@@ -9,6 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
@@ -45,12 +47,15 @@ import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.runningReduce
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import zs.xmx.hi.training.model.Person
 
@@ -728,9 +733,110 @@ class FlowOperatorViewModel : ViewModel() {
         }
     }
 
+    //-----------------------Flow 冷流转热流-----------------------------------------------
+    //以下案例仅用作测试,实际开发不要在方法中用shareIn或stateIn创建热流,因为会创建无数个热流无法释放
+    /**
+     * stateIn , 将Flow冷流转换成 StateFlow类型的热流对象
+     * @param scope 开始共享的协程作用域
+     * @param started 控制何时开始和停止共享的策略
+     *     - Eagerly: 共享立即开始,永不停止
+     *     - Lazily: 共享在第一个订阅者出现时开始，并且永远不会停止
+     *     - WhileSubscribed: 共享在第一个订阅者出现时开始，在最后一个订阅者消失时立即停止（默认情况下），永久保留重播缓存（默认）。
+     *          1. stopTimeoutMillis 配置最后一个订阅者消失和共享协程停止之间的延迟（以毫秒为单位）。它默认为零（立即停止）
+     *          2. replayExpirationMillis 配置共享协程停止和重放缓存重置之间的延迟（以毫秒为单位）
+     *          （这将使运算符的shareIn缓存为空，并将运算符的缓存值重置为原始initialValuestateIn值）。
+     *          它默认为Long.MAX_VALUE（永久保留重放缓存，从不重置缓冲区）。使用零值可立即使缓存过期
+     *
+     * @param initialValue 初始值
+     *
+     * 还有个单参数 stateIn(scope)
+     * 在给定scope的 中启动上游流，暂停直到发出第一个值，并返回未来发射的热StateFlow值，
+     * 与多个下游订阅者共享上游流的此运行实例中最近发出的值
+     */
+    fun stateInOnFlow() = viewModelScope.launch {
+        /*
+            观察者每隔100ms发送元素,第一个订阅者马上接收,第二个订阅者等待700ms后接收
+            第一个订阅者马上接收,打印0,1,2,3,而第二个订阅者延时700ms,理论上不会打印了
+            但因为stateFlow特性,第二个订阅者能接收最新的数据,那么会打印3
+         */
+        val stateFlow = flowOf(1, 2, 3)
+            .onStart { Log.i(TAG, "Start") }
+            .onEach { delay(100) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+        //第一个订阅者
+        launch {
+            stateFlow.collect {
+                Log.i(TAG, "collect: $it")
+            }
+        }
+
+        //第二个订阅者(延时700ms再订阅)
+        launch {
+            delay(700)
+            stateFlow.collect {
+                Log.d(TAG, "--- collect: $it")
+            }
+        }
+
+        delay(1000) //等待观察者发送完所有元素
+
+        Log.i(TAG, "Done")
+    }
+
+
+    /**
+     * shareIn , 将Flow冷流转换成 SharedFlow类型的热流对象
+     * @param scope 开始共享的协程作用域
+     * @param started 控制何时开始和停止共享的策略
+     *     - Eagerly: 共享立即开始,永不停止
+     *     - Lazily: 共享在第一个订阅者出现时开始，并且永远不会停止
+     *     - WhileSubscribed: 共享在第一个订阅者出现时开始，在最后一个订阅者消失时立即停止（默认情况下），永久保留重播缓存（默认）。
+     *          1. stopTimeoutMillis 配置最后一个订阅者消失和共享协程停止之间的延迟（以毫秒为单位）。它默认为零（立即停止）
+     *          2. replayExpirationMillis 配置共享协程停止和重放缓存重置之间的延迟（以毫秒为单位）
+     *          （这将使运算符的shareIn缓存为空，并将运算符的缓存值重置为原始initialValuestateIn值）。
+     *          它默认为Long.MAX_VALUE（永久保留重放缓存，从不重置缓冲区）。使用零值可立即使缓存过期
+     * @param replay  给新的订阅者,旧值的数量(默认为零,不能为负数)
+     *
+     */
+    fun sharedInOnFlow() = viewModelScope.launch {
+        /*
+            观察者每隔100ms发送元素,第一个订阅者马上接收,第二个订阅者等待250ms后接收
+            当replay设置为0 , 第一个订阅者马上接收,打印1,2,3,4,5,而第二个订阅者延时250ms,就只能打印3,4,5了
+            当replay设置为1,第二个订阅者能接收到一个旧值,那么会打印2,3,4,5
+         */
+        val sharedFlow = flowOf(1, 2, 3, 4, 5)
+            .onEach { delay(100) }
+            .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+
+        //第一个订阅者
+        launch {
+            sharedFlow.collect {
+                delay(100)
+                Log.i(TAG, "collect: $it")
+            }
+        }
+
+        //第二个订阅者(延时250ms再订阅)
+        launch {
+            delay(250)
+            sharedFlow.collect {
+                delay(100)
+                Log.d(
+                    TAG,
+                    "--- collect: $it "
+                )
+            }
+        }
+
+        delay(1000) //等待观察者发送完所有元素
+
+        Log.i(TAG, "Done")
+
+    }
 
     companion object {
-        val TAG = "FlowOperator"
+        private val TAG = "FlowOperator"
     }
 
 

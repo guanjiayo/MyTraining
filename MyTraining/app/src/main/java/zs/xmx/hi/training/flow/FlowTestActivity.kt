@@ -27,9 +27,56 @@ class FlowTestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flow_test)
+        initObserver()
+        initEvent()
+        sharedFlowTest()
+    }
 
+    private fun initObserver() {
+        /*
+        如果需要更新界面，切勿使用 launch 或 launchIn 扩展函数从界面直接收集数据流。
+        即使 View 不可见，这些函数也会处理事件。此行为可能会导致应用崩溃。
+        为避免这种情况，请使用 repeatOnLifecycle API（如下所示）。
+         */
+
+        //1. 在生命周期范围内启动协程
+        lifecycleScope.launch {
+            //2. repeatOnLifecycle 配置宿主在 STARTED 状态时执行操作,超出这个状态后该协程会自动取消
+            //repeatOnLifecycle API 仅在 androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01 库及更高版本中提供。
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mStateFlowViewModel.uiState.collect {
+                    Log.i(tag, "数据:  $it  宿主状态:  ${lifecycle.currentState}")
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mStateFlowViewModel.batchDataState.collect {
+                    Log.i(tag, "batchData:  $it")
+                }
+            }
+        }
+
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mStateFlowMediatorViewModel.flow.collect {
+                    Log.i(tag, "数量:  $it  ${lifecycle.currentState}")
+                    findViewById<TextView>(R.id.tv_flow_count).text = "数量: $it"
+                }
+            }
+        }
+
+    }
+
+    private fun initEvent() {
         findViewById<Button>(R.id.btn_stateflow).setOnClickListener {
             mStateFlowViewModel.changeData("StateFlow 模仿LiveData 测试")
+        }
+
+        findViewById<Button>(R.id.action_stateFlow_batch).setOnClickListener {
+            mStateFlowViewModel.batchData()
         }
 
         findViewById<Button>(R.id.btn_flow1).setOnClickListener {
@@ -50,34 +97,6 @@ class FlowTestActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_network).setOnClickListener {
             startActivity(Intent(this, NetRequestActivity::class.java))
         }
-
-        /*
-        如果需要更新界面，切勿使用 launch 或 launchIn 扩展函数从界面直接收集数据流。
-        即使 View 不可见，这些函数也会处理事件。此行为可能会导致应用崩溃。
-        为避免这种情况，请使用 repeatOnLifecycle API（如上所示）。
-         */
-
-        //1. 在生命周期范围内启动协程
-        lifecycleScope.launch {
-            //2. repeatOnLifecycle 配置宿主在 STARTED 状态时执行操作,超出这个状态后该协程会自动取消
-            //repeatOnLifecycle API 仅在 androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01 库及更高版本中提供。
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mStateFlowViewModel.uiState.collect {
-                    Log.i(tag, "数据:  $it  宿主状态:  ${lifecycle.currentState}")
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mStateFlowMediatorViewModel.flow.collect {
-                    Log.i(tag, "数量:  $it  ${lifecycle.currentState}")
-                    findViewById<TextView>(R.id.tv_flow_count).text = "数量: $it"
-                }
-            }
-        }
-
-        sharedFlowTest()
     }
 
     private fun sharedFlowTest() {
